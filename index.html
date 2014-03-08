@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
-        <title>Jeff's Pontifications</title>
+        <title>Eclectic Pontifications</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
@@ -12,26 +12,56 @@
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="/">Jeff's Pontifications </a></h1>
+                <h1><a href="/">Eclectic Pontifications </a></h1>
                 <nav><ul>
-                    <li><a href="/category/general.html">General</a></li>
+                    <li><a href="/category/tech.html">Tech</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/my-first-pelican-post.html">My First Pelican Post</a></h1>
+                    <h1 class="entry-title"><a href="/pelican-for-static-blog.html">Pelican for Static Blogging</a></h1>
 <footer class="post-info">
-        <abbr class="published" title="2014-03-02T00:00:00">
-                Sun 02 March 2014
+        <abbr class="published" title="2014-03-07T15:45:00">
+                Fri 07 March 2014
         </abbr>
 
         <address class="vcard author">
-                By <a class="url fn" href="/author/jeff.html">Jeff</a>
+                By <a class="url fn" href="/author/jmg.html">JMG</a>
         </address>
-<p>In <a href="/category/general.html">General</a>. </p>
+<p>In <a href="/category/tech.html">Tech</a>. </p>
 <p>tags: <a href="/tag/pelican.html">pelican</a></p>
-</footer><!-- /.post-info --><p>Welcome to my blog. This is my very first post using the <a href="http://docs.getpelican.com">Pelican</a> static site generating toolset. I'm looking for a simple tool that I can use to generate content that I will then host via GitHub Pages. Along the way, I hope to share my thoughts on a variety of subjects that I find interesting. It is doubtful that anyone else will find these especially interesting, but there you go.</p>                </article>
+</footer><!-- /.post-info --><h1>Background</h1>
+<p>I'm an opinionated technology fan with various eclectic thoughts to share, so why not add another blog to the universe. I mean who wouldn't want to hear my thoughts on everything from using Python to automate my tasks at work to what type of toilet brush you should be using.</p>
+<p>While I'm a fan of technology, more importantly, I'm cheap and want to host this for exactly $0: enter GitHub pages and Pelican. I do a fair bit of Python programming at work and at play, so I liked the sound of a Python based static site generater tool rather than the Ruby based Jekyll. Now don't get me wrong, I don't have anything against Ruby or Jekyll, I just decided to start with Pelican since it is Python based.</p>
+<h1>Software</h1>
+<p>I'm starting with <a href="http://docs.getpelican.com/en/3.3.0/">Pelican</a> as the blogging engine. I will be writing my content with <a href="http://daringfireball.net/projects/markdown/">Markdown</a>. I will be working in a <a href="http://www.virtualenv.org/en/latest/">virtualenv</a> setup to generate all my content. </p>
+<p>Installing Pelican and Markdown is dead simple.</p>
+<p>You will need to create a virtualenv first:</p>
+<div class="highlight"><pre><span class="n">virtualenv</span> <span class="n">pelicanenv</span>
+</pre></div>
+
+
+<p>This will create a pelicanenv directory that will house your Python executible and install other tools (e.g. <a href="http://www.pip-installer.org/en/latest/">pip</a>) that you can use to install Pelican and Markdown.</p>
+<p>You will need to activate your pelicanenv</p>
+<div class="highlight"><pre><span class="p">.</span> <span class="n">pelicanenv</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">activate</span>
+</pre></div>
+
+
+<p>Once you have done this you can install pelican and markdown:</p>
+<div class="highlight"><pre><span class="n">pip</span> <span class="n">install</span> <span class="n">pelican</span> <span class="n">markdown</span>
+</pre></div>
+
+
+<p>This will use the pip installation in your pelicanenv and install the latest pelican and markdown to the site-packages directory.</p>
+<p>I'll leave it to you to read through the <a href="http://docs.getpelican.com/en/3.3.0/getting_started.html">Getting Started</a> guide for the rest of it, but this will get you started.</p>
+<h1>Other tools</h1>
+<p>I am using <a href="https://bitbucket.org">Bitbucket</a> to store the source of the blog and publishing to <a href="https://github.com">GitHub</a>. Why you ask? Did I mention that I am cheap? Bitbucket allows me to have private Git repositories for free. GitHub allows me to host my static content for free. I believe Bitbucket will allow me to do the same (see <a href="http://pages.bitbucket.org/">this</a>), but is very undocumented. I may experiment with that, but for now I'll use the better documented <a href="http://pages.github.com/">GitHub Pages</a>.</p>
+<p>I am using the excellent <a href="http://www.sourcetreeapp.com/">SourceTree</a> for working with my Git repositories.</p>
+<p>I am using <a href="http://www.sublimetext.com/2">Sublimet Text</a> as my text editor of choice.</p>
+<h1>Future</h1>
+<p>This is obviously the very basics of my new blog, and I will continue to write posts as I go through learning Pelican. Right now I'm sticking with the default theme that ships with it, but I will be experimenting with other themes and write about my experiences.</p>
+<p>In the future I <em>may</em> turn on <a href="http://www.disqus.com/">Disqus</a> comments. I will just wait and see how much abuse I am willing to open myself up to.</p>                </article>
 <p class="paginator">
     Page 1 / 1
 </p>
