@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Eclectic Pontifications</title><link href="http://jmg95.github.io/" rel="alternate"></link><link href="http://jmg95.github.io/feeds/all.atom.xml" rel="self"></link><id>http://jmg95.github.io/</id><updated>2014-03-23T14:10:00-05:00</updated><entry><title>Texas Rangers Preview 2014</title><link href="http://jmg95.github.io/tx-rangers-preview-2014.html" rel="alternate"></link><updated>2014-03-23T14:10:00-05:00</updated><author><name>JMG</name></author><id>tag:jmg95.github.io,2014-03-23:tx-rangers-preview-2014.html</id><summary type="html">&lt;p&gt;Growing up in the Dallas-Fort Worth Metroplex I was always a fan of the Texas Rangers. Texas is football country and without a doubt the Dallas Cowboys still manage to grab the biggest sports headlines in this area, even through the futility we have seen in their performances after the glory days of the 1990s. The two World Series trips the Rangers made in 2010 and 2011 helped bring them to the forefront and has helped grow their fan base, as well as their headlines. They have even had their share of front office dramas with Nolan Ryan leaving on less than the best terms.&lt;/p&gt;
+&lt;h2&gt;Prediction&lt;/h2&gt;
+&lt;p&gt;I'm certainly no sports writer, and I have exactly &lt;strong&gt;zero&lt;/strong&gt; qualifications to be making predictions on the type of season the Rangers should expect this year. But since I have this blog and I can say whatever I want, I'm predicting &lt;strong&gt;86 wins and 2nd place in the AL West&lt;/strong&gt;. &lt;/p&gt;
+&lt;h2&gt;Pitching&lt;/h2&gt;
+&lt;p&gt;Yu Darvish is a legitimate No. 1 starter. He would be No. 1 in the rotation on probably half the teams in the AL. Colby Lewis has not looked great this spring, but I am hopeful that he will get healthy early and will contribute throughout the year. The injury of Derek Holland is going to hurt, and I'm not so sure that he will even get to pitch this season. A July return from his injury seems pretty optimistic to me. I think Tanner Scheppers will make a great addition to the rotation, and he has looked great this spring training. I think moving Joakim Soria to closer will work out well. That is a role he has excelled in before. I'm not sure where Neftali Feliz will end up. His recovery from Tommy John surgery has robbed him of some of his velicity.&lt;/p&gt;
+&lt;h2&gt;Hitting&lt;/h2&gt;
+&lt;p&gt;The addition of Prince Fielder in the off season has certainly made a splash. With the short right field porch at his new home ballpark should give him the ability to put up some monster numbers. He has shown he can stay healthy throughout the season while playing in Detroit, but I guess we will have to wait and see how the Texas heat affects him. Jurickson Profar should improve on his numbers from last year. The tandem of Jurickson Profar and Elvis Andrus will take some time to develop, but I believe it should be there after a month to six weeks.&lt;/p&gt;</summary><category term="rangers"></category></entry><entry><title>Pelican for Static Blogging</title><link href="http://jmg95.github.io/pelican-for-static-blog.html" rel="alternate"></link><updated>2014-03-07T15:45:00-06:00</updated><author><name>JMG</name></author><id>tag:jmg95.github.io,2014-03-07:pelican-for-static-blog.html</id><summary type="html">&lt;h1&gt;Background&lt;/h1&gt;
+&lt;p&gt;I'm an opinionated technology fan with various eclectic thoughts to share, so why not add another blog to the universe. I mean who wouldn't want to hear my thoughts on everything from using Python to automate my tasks at work to what type of toilet brush you should be using.&lt;/p&gt;
+&lt;p&gt;While I'm a fan of technology, more importantly, I'm cheap and want to host this for exactly $0: enter GitHub pages and Pelican. I do a fair bit of Python programming at work and at play, so I liked the sound of a Python based static site generater tool rather than the Ruby based Jekyll. Now don't get me wrong, I don't have anything against Ruby or Jekyll, I just decided to start with Pelican since it is Python based.&lt;/p&gt;
+&lt;h1&gt;Software&lt;/h1&gt;
+&lt;p&gt;I'm starting with &lt;a href="http://docs.getpelican.com/en/3.3.0/"&gt;Pelican&lt;/a&gt; as the blogging engine. I will be writing my content with &lt;a href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt;. I will be working in a &lt;a href="http://www.virtualenv.org/en/latest/"&gt;virtualenv&lt;/a&gt; setup to generate all my content. &lt;/p&gt;
+&lt;p&gt;Installing Pelican and Markdown is dead simple.&lt;/p&gt;
+&lt;p&gt;You will need to create a virtualenv first:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;virtualenv&lt;/span&gt; &lt;span class="n"&gt;pelicanenv&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This will create a pelicanenv directory that will house your Python executible and install other tools (e.g. &lt;a href="http://www.pip-installer.org/en/latest/"&gt;pip&lt;/a&gt;) that you can use to install Pelican and Markdown.&lt;/p&gt;
+&lt;p&gt;You will need to activate your pelicanenv&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;.&lt;/span&gt; &lt;span class="n"&gt;pelicanenv&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;activate&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Once you have done this you can install pelican and markdown:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;pip&lt;/span&gt; &lt;span class="n"&gt;install&lt;/span&gt; &lt;span class="n"&gt;pelican&lt;/span&gt; &lt;span class="n"&gt;markdown&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This will use the pip installation in your pelicanenv and install the latest pelican and markdown to the site-packages directory.&lt;/p&gt;
+&lt;p&gt;I'll leave it to you to read through the &lt;a href="http://docs.getpelican.com/en/3.3.0/getting_started.html"&gt;Getting Started&lt;/a&gt; guide for the rest of it, but this will get you started.&lt;/p&gt;
+&lt;h1&gt;Other tools&lt;/h1&gt;
+&lt;p&gt;I am using &lt;a href="https://bitbucket.org"&gt;Bitbucket&lt;/a&gt; to store the source of the blog and publishing to &lt;a href="https://github.com"&gt;GitHub&lt;/a&gt;. Why you ask? Did I mention that I am cheap? Bitbucket allows me to have private Git repositories for free. GitHub allows me to host my static content for free. I believe Bitbucket will allow me to do the same (see &lt;a href="http://pages.bitbucket.org/"&gt;this&lt;/a&gt;), but is very undocumented. I may experiment with that, but for now I'll use the better documented &lt;a href="http://pages.github.com/"&gt;GitHub Pages&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I am using the excellent &lt;a href="http://www.sourcetreeapp.com/"&gt;SourceTree&lt;/a&gt; for working with my Git repositories.&lt;/p&gt;
+&lt;p&gt;I am using &lt;a href="http://www.sublimetext.com/2"&gt;Sublimet Text&lt;/a&gt; as my text editor of choice.&lt;/p&gt;
+&lt;h1&gt;Future&lt;/h1&gt;
+&lt;p&gt;This is obviously the very basics of my new blog, and I will continue to write posts as I go through learning Pelican. Right now I'm sticking with the default theme that ships with it, but I will be experimenting with other themes and write about my experiences.&lt;/p&gt;
+&lt;p&gt;In the future I &lt;em&gt;may&lt;/em&gt; turn on &lt;a href="http://www.disqus.com/"&gt;Disqus&lt;/a&gt; comments. I will just wait and see how much abuse I am willing to open myself up to.&lt;/p&gt;</summary><category term="pelican"></category></entry></feed>
