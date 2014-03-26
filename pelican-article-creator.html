@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
-        <title>Eclectic Pontifications - JMG</title>
+        <title>Pelican Article Creator</title>
         <link rel="stylesheet" href="http://jmg95.github.io/theme/css/main.css" />
         <link href="http://jmg95.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Eclectic Pontifications Atom Feed" />
 
@@ -16,13 +16,18 @@
                 <h1><a href="http://jmg95.github.io/">Eclectic Pontifications </a></h1>
                 <nav><ul>
                     <li><a href="http://jmg95.github.io/category/sport.html">Sport</a></li>
-                    <li><a href="http://jmg95.github.io/category/tech.html">Tech</a></li>
+                    <li class="active"><a href="http://jmg95.github.io/category/tech.html">Tech</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://jmg95.github.io/pelican-article-creator.html" rel="bookmark"
+           title="Permalink to Pelican Article Creator">Pelican Article Creator</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="http://jmg95.github.io/pelican-article-creator.html">Pelican Article Creator</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2014-03-26T12:49:00">
                 Wed 26 March 2014
@@ -33,7 +38,7 @@
         </address>
 <p>In <a href="http://jmg95.github.io/category/tech.html">Tech</a>. </p>
 <p>tags: <a href="http://jmg95.github.io/tag/pelican.html">pelican</a><a href="http://jmg95.github.io/tag/python.html">python</a></p>
-</footer><!-- /.post-info --><p>I found myself having to look up old articles or refering back to the <a href="http://docs.getpelican.com/en/3.3.0/getting_started.html#writing-content-using-pelican">Pelican</a> documentation in order to remember what metadata to include at the top of each article. I placed the python script below in the root directory of my blog (right next to the pelicanconf.py). It will generate the stub of an article, that I can then open up and write the content for.</p>
+</footer><!-- /.post-info -->      <p>I found myself having to look up old articles or refering back to the <a href="http://docs.getpelican.com/en/3.3.0/getting_started.html#writing-content-using-pelican">Pelican</a> documentation in order to remember what metadata to include at the top of each article. I placed the python script below in the root directory of my blog (right next to the pelicanconf.py). It will generate the stub of an article, that I can then open up and write the content for.</p>
 <div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -82,61 +87,11 @@
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</pre></div>
+    </div><!-- /.entry-content -->
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="http://jmg95.github.io/tx-rangers-preview-2014.html" rel="bookmark"
-                           title="Permalink to Texas Rangers Preview 2014">Texas Rangers Preview 2014</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2014-03-23T14:10:00">
-                Sun 23 March 2014
-        </abbr>
-
-        <address class="vcard author">
-                By <a class="url fn" href="http://jmg95.github.io/author/jmg.html">JMG</a>
-        </address>
-<p>In <a href="http://jmg95.github.io/category/sport.html">Sport</a>. </p>
-<p>tags: <a href="http://jmg95.github.io/tag/rangers.html">rangers</a></p>
-</footer><!-- /.post-info -->                <p>Texas Rangers season preview for 2014</p>
-                <a class="readmore" href="http://jmg95.github.io/tx-rangers-preview-2014.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="http://jmg95.github.io/pelican-for-static-blog.html" rel="bookmark"
-                           title="Permalink to Pelican for Static Blogging">Pelican for Static Blogging</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2014-03-07T15:45:00">
-                Fri 07 March 2014
-        </abbr>
-
-        <address class="vcard author">
-                By <a class="url fn" href="http://jmg95.github.io/author/jmg.html">JMG</a>
-        </address>
-<p>In <a href="http://jmg95.github.io/category/tech.html">Tech</a>. </p>
-<p>tags: <a href="http://jmg95.github.io/tag/pelican.html">pelican</a></p>
-</footer><!-- /.post-info -->                <p>Why I chose pelican for my static blog</p>
-                <a class="readmore" href="http://jmg95.github.io/pelican-for-static-blog.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-            </ol><!-- /#posts-list -->
-<p class="paginator">
-    Page 1 / 1
-</p>
-            </section><!-- /#content -->
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>blogroll</h2>

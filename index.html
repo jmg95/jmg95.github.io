@@ -22,7 +22,80 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="http://jmg95.github.io/tx-rangers-preview-2014.html">Texas Rangers Preview 2014</a></h1>
+                    <h1 class="entry-title"><a href="http://jmg95.github.io/pelican-article-creator.html">Pelican Article Creator</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2014-03-26T12:49:00">
+                Wed 26 March 2014
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://jmg95.github.io/author/jmg.html">JMG</a>
+        </address>
+<p>In <a href="http://jmg95.github.io/category/tech.html">Tech</a>. </p>
+<p>tags: <a href="http://jmg95.github.io/tag/pelican.html">pelican</a><a href="http://jmg95.github.io/tag/python.html">python</a></p>
+</footer><!-- /.post-info --><p>I found myself having to look up old articles or refering back to the <a href="http://docs.getpelican.com/en/3.3.0/getting_started.html#writing-content-using-pelican">Pelican</a> documentation in order to remember what metadata to include at the top of each article. I placed the python script below in the root directory of my blog (right next to the pelicanconf.py). It will generate the stub of an article, that I can then open up and write the content for.</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">CONTENT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">__file__</span><span class="p">)),</span> <span class="s">&#39;content&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">slugify</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&quot;\W+&quot;</span><span class="p">,</span> <span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;&#39;&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">u&quot;-&quot;</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">gather_user_data</span><span class="p">():</span>
+    <span class="n">myData</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">myData</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Title: &quot;</span><span class="p">)</span>
+    <span class="n">myData</span><span class="p">[</span><span class="s">&#39;category&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Category: &quot;</span><span class="p">)</span>
+    <span class="n">myData</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Tags (comma separated): &quot;</span><span class="p">)</span>
+    <span class="n">myData</span><span class="p">[</span><span class="s">&#39;summary&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Summary: &quot;</span><span class="p">)</span>
+    <span class="n">myData</span><span class="p">[</span><span class="s">&#39;slug&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">slugify</span><span class="p">(</span><span class="n">myData</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">myData</span>
+
+<span class="k">def</span> <span class="nf">write_content</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">outFileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">CONTENT</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;slug&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;.md&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outFileName</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;File already exists!&quot;</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outFileName</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outFile</span><span class="p">:</span>
+        <span class="n">txtTitle</span> <span class="o">=</span> <span class="s">&quot;Title: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">])</span>
+        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txtTitle</span><span class="p">)</span>
+        <span class="n">txtDate</span> <span class="o">=</span> <span class="s">&quot;Date: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span>\
+            <span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%Y-%m-</span><span class="si">%d</span><span class="s"> %H:%M&quot;</span><span class="p">))</span>
+        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txtDate</span><span class="p">)</span>
+        <span class="n">category</span> <span class="o">=</span> <span class="s">&quot;Category: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;category&#39;</span><span class="p">])</span>
+        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+        <span class="n">txtTag</span> <span class="o">=</span> <span class="s">&quot;Tags: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">])</span>
+        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txtTag</span><span class="p">)</span>
+        <span class="n">txtSlug</span> <span class="o">=</span> <span class="s">&quot;Slug: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;slug&#39;</span><span class="p">])</span>
+        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txtSlug</span><span class="p">)</span>
+        <span class="n">txtAuthor</span> <span class="o">=</span> <span class="s">&quot;Author: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s">&quot;JMG&quot;</span><span class="p">)</span>
+        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txtAuthor</span><span class="p">)</span>
+        <span class="n">txtSummary</span> <span class="o">=</span> <span class="s">&quot;Summary: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;summary&#39;</span><span class="p">])</span>
+        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txtSummary</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">write_content</span><span class="p">(</span><span class="n">gather_user_data</span><span class="p">())</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="http://jmg95.github.io/tx-rangers-preview-2014.html" rel="bookmark"
+                           title="Permalink to Texas Rangers Preview 2014">Texas Rangers Preview 2014</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2014-03-23T14:10:00">
                 Sun 23 March 2014
@@ -33,18 +106,10 @@
         </address>
 <p>In <a href="http://jmg95.github.io/category/sport.html">Sport</a>. </p>
 <p>tags: <a href="http://jmg95.github.io/tag/rangers.html">rangers</a></p>
-</footer><!-- /.post-info --><p>Growing up in the Dallas-Fort Worth Metroplex I was always a fan of the Texas Rangers. Texas is football country and without a doubt the Dallas Cowboys still manage to grab the biggest sports headlines in this area, even through the futility we have seen in their performances after the glory days of the 1990s. The two World Series trips the Rangers made in 2010 and 2011 helped bring them to the forefront and has helped grow their fan base, as well as their headlines. They have even had their share of front office dramas with Nolan Ryan leaving on less than the best terms.</p>
-<h2>Prediction</h2>
-<p>I'm certainly no sports writer, and I have exactly <strong>zero</strong> qualifications to be making predictions on the type of season the Rangers should expect this year. But since I have this blog and I can say whatever I want, I'm predicting <strong>86 wins and 2nd place in the AL West</strong>. </p>
-<h2>Pitching</h2>
-<p>Yu Darvish is a legitimate No. 1 starter. He would be No. 1 in the rotation on probably half the teams in the AL. Colby Lewis has not looked great this spring, but I am hopeful that he will get healthy early and will contribute throughout the year. The injury of Derek Holland is going to hurt, and I'm not so sure that he will even get to pitch this season. A July return from his injury seems pretty optimistic to me. I think Tanner Scheppers will make a great addition to the rotation, and he has looked great this spring training. I think moving Joakim Soria to closer will work out well. That is a role he has excelled in before. I'm not sure where Neftali Feliz will end up. His recovery from Tommy John surgery has robbed him of some of his velicity.</p>
-<h2>Hitting</h2>
-<p>The addition of Prince Fielder in the off season has certainly made a splash. With the short right field porch at his new home ballpark should give him the ability to put up some monster numbers. He has shown he can stay healthy throughout the season while playing in Detroit, but I guess we will have to wait and see how the Texas heat affects him. Jurickson Profar should improve on his numbers from last year. The tandem of Jurickson Profar and Elvis Andrus will take some time to develop, but I believe it should be there after a month to six weeks.</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Texas Rangers season preview for 2014</p>
+                <a class="readmore" href="http://jmg95.github.io/tx-rangers-preview-2014.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
