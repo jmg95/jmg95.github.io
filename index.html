@@ -22,7 +22,129 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="http://jmg95.github.io/pelican-article-creator.html">Pelican Article Creator</a></h1>
+                    <h1 class="entry-title"><a href="http://jmg95.github.io/arcgis-raster-footprints.html">ArcGIS Raster Footprints</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2014-04-03T19:08:00">
+                Thu 03 April 2014
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://jmg95.github.io/author/jmg.html">JMG</a>
+        </address>
+<p>In <a href="http://jmg95.github.io/category/tech.html">Tech</a>. </p>
+<p>tags: <a href="http://jmg95.github.io/tag/gis.html">gis</a><a href="http://jmg95.github.io/tag/arcpy.html">arcpy</a></p>
+</footer><!-- /.post-info --><p>Occasionally while working with rasters in ArcGIS I have the need to create "footprints" of the extent of each raster. For a while we just used the minimum bounding rectangle of each raster, but then our clients requested to see the actual boundary. There are several raster toolsets that will accomplish this, but typically require a higher level of ArcGIS use or were slow because they actually processed the image to determine the extent of coverage. We were typically georeferencing historical maps so we would crop the images to the extent we required. The solution we ended up with utilizes the world file that is created when the georeferencing takes place. Based on the extents and rotation of the coordinates in the world file we create a polygon. Below is the Python code we came up.</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">xml.dom.minidom</span> <span class="kn">import</span> <span class="n">parse</span>
+
+<span class="k">def</span> <span class="nf">get_raster_bounding_poly</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">worldfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create footprint polygon based on pixel size and rotation of raster image.</span>
+<span class="sd">    Use worldfile to determine scale and rotation. Pass in raster image and</span>
+<span class="sd">    path to world file to return arcpy.Polygon of footprint of the raster image.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wf_values</span> <span class="o">=</span> <span class="n">read_world</span><span class="p">(</span><span class="n">worldfile</span><span class="p">)</span>
+    <span class="n">px_rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arcpy</span><span class="o">.</span><span class="n">GetRasterProperties_management</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="s">&quot;ROWCOUNT&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">getOutput</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">px_columns</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arcpy</span><span class="o">.</span><span class="n">GetRasterProperties_management</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="s">&quot;COLUMNCOUNT&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">getOutput</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">thePoints</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Array</span><span class="p">()</span>
+    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_coords_from_raster</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">wf_values</span><span class="p">)</span>
+    <span class="n">topLeft</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_coords_from_raster</span><span class="p">(</span><span class="n">px_columns</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">wf_values</span><span class="p">)</span>
+    <span class="n">topRight</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_coords_from_raster</span><span class="p">(</span><span class="n">px_columns</span><span class="p">,</span> <span class="n">px_rows</span><span class="p">,</span> <span class="n">wf_values</span><span class="p">)</span>
+    <span class="n">botRight</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_coords_from_raster</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">px_rows</span><span class="p">,</span> <span class="n">wf_values</span><span class="p">)</span>
+    <span class="n">botLeft</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">thePoints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">topLeft</span><span class="p">)</span>
+    <span class="n">thePoints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">topRight</span><span class="p">)</span>
+    <span class="n">thePoints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">botRight</span><span class="p">)</span>
+    <span class="n">thePoints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">botLeft</span><span class="p">)</span>
+    <span class="n">thePoints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">topLeft</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Polygon</span><span class="p">(</span><span class="n">thePoints</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_raster_list</span><span class="p">(</span><span class="n">thePath</span><span class="p">):</span>
+    <span class="s">&quot;Helper function to set env.workspace and return list of Rasters&quot;</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">workspace</span> <span class="o">=</span> <span class="n">thePath</span>
+    <span class="k">return</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListRasters</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">read_world</span><span class="p">(</span><span class="n">worldfile</span><span class="p">):</span>
+    <span class="s">&quot;Read WorldFile from disk and put variables into Dict()&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">worldfile</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wf</span><span class="p">:</span>
+        <span class="n">theVals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">wf</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+    <span class="n">myVals</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">theVals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                  <span class="n">D</span><span class="o">=</span><span class="n">theVals</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                  <span class="n">B</span><span class="o">=</span><span class="n">theVals</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                  <span class="n">E</span><span class="o">=</span><span class="n">theVals</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                  <span class="n">C</span><span class="o">=</span><span class="n">theVals</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+                  <span class="n">F</span><span class="o">=</span><span class="n">theVals</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">myVals</span>
+
+<span class="k">def</span> <span class="nf">get_coords_from_raster</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">worldVals</span><span class="p">):</span>
+    <span class="s">&quot;Pass x,y as pixel positions from image along with Dict of world file values to return back map coords&quot;</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="p">(</span><span class="n">worldVals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">worldVals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;B&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">worldVals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">)</span>
+    <span class="n">y1</span> <span class="o">=</span> <span class="p">(</span><span class="n">worldVals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;D&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">worldVals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;E&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">worldVals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">determine_wf_name</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">raster</span><span class="p">):</span>
+    <span class="s">&quot;Determine the world file name based on raster (tif, jpg, bil)&quot;</span>
+    <span class="n">wfname</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">raster</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.tif&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.tfw&quot;</span><span class="p">)):</span>
+            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.tfw&quot;</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.tifw&quot;</span><span class="p">)):</span>
+            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.tifw&quot;</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.tfwx&quot;</span><span class="p">)):</span>
+            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.tfwx&quot;</span>
+    <span class="k">elif</span> <span class="n">ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.jpg&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.jgw&quot;</span><span class="p">)):</span>
+            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.jgw&quot;</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.jpgw&quot;</span><span class="p">)):</span>
+            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.jpgw&quot;</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.jgwx&quot;</span><span class="p">)):</span>
+            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.jgwx&quot;</span>
+    <span class="k">elif</span> <span class="n">ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.bil&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.blw&quot;</span><span class="p">)):</span>
+            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.blw&quot;</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.bilw&quot;</span><span class="p">)):</span>
+            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.bilw&quot;</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.bilx&quot;</span><span class="p">)):</span>
+            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.bilx&quot;</span>
+    <span class="k">if</span> <span class="n">wfname</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">wfname</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+<span class="k">def</span> <span class="nf">get_raster_spatial_reference</span><span class="p">(</span><span class="n">theXml</span><span class="p">):</span>
+    <span class="s">&quot;Return the SpatialReference base on WKT from aux.xml file for Georeferenced Rasters&quot;</span>
+    <span class="n">myXml</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">theXml</span><span class="p">)</span>
+
+    <span class="n">wkt_elements</span> <span class="o">=</span> <span class="n">myXml</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s">&quot;WKT&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">wkt_elements</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">wkt</span> <span class="o">=</span> <span class="n">wkt_elements</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;No WKT text&quot;</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="n">wktText</span> <span class="o">=</span> <span class="n">wkt</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">data</span>
+    <span class="n">sr</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SpatialReference</span><span class="p">()</span>
+    <span class="n">sr</span><span class="o">.</span><span class="n">loadFromString</span><span class="p">(</span><span class="n">wktText</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sr</span>
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="http://jmg95.github.io/pelican-article-creator.html" rel="bookmark"
+                           title="Permalink to Pelican Article Creator">Pelican Article Creator</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2014-03-26T12:49:00">
                 Wed 26 March 2014
@@ -33,61 +155,10 @@
         </address>
 <p>In <a href="http://jmg95.github.io/category/tech.html">Tech</a>. </p>
 <p>tags: <a href="http://jmg95.github.io/tag/pelican.html">pelican</a><a href="http://jmg95.github.io/tag/python.html">python</a></p>
-</footer><!-- /.post-info --><p>I found myself having to look up old articles or refer back to the <a href="http://docs.getpelican.com/en/3.3.0/getting_started.html#writing-content-using-pelican">Pelican</a> documentation in order to remember what metadata to include at the top of each article. I placed the python script below in the root directory of my blog (right next to the pelicanconf.py). It will generate the stub of an article, that I can then open up and write the content for.</p>
-<div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">re</span>
-
-<span class="n">CONTENT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">__file__</span><span class="p">)),</span> <span class="s">&#39;content&#39;</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">slugify</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&quot;\W+&quot;</span><span class="p">,</span> <span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;&#39;&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
-    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">u&quot;-&quot;</span><span class="p">):</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">result</span>
-
-<span class="k">def</span> <span class="nf">gather_user_data</span><span class="p">():</span>
-    <span class="n">myData</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">myData</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Title: &quot;</span><span class="p">)</span>
-    <span class="n">myData</span><span class="p">[</span><span class="s">&#39;category&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Category: &quot;</span><span class="p">)</span>
-    <span class="n">myData</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Tags (comma separated): &quot;</span><span class="p">)</span>
-    <span class="n">myData</span><span class="p">[</span><span class="s">&#39;summary&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Summary: &quot;</span><span class="p">)</span>
-    <span class="n">myData</span><span class="p">[</span><span class="s">&#39;slug&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">slugify</span><span class="p">(</span><span class="n">myData</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">myData</span>
-
-<span class="k">def</span> <span class="nf">write_content</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-    <span class="n">outFileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">CONTENT</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;slug&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;.md&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outFileName</span><span class="p">):</span>
-        <span class="k">print</span> <span class="s">&quot;File already exists!&quot;</span>
-        <span class="k">return</span> <span class="bp">False</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outFileName</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outFile</span><span class="p">:</span>
-        <span class="n">txtTitle</span> <span class="o">=</span> <span class="s">&quot;Title: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">])</span>
-        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txtTitle</span><span class="p">)</span>
-        <span class="n">txtDate</span> <span class="o">=</span> <span class="s">&quot;Date: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span>\
-            <span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%Y-%m-</span><span class="si">%d</span><span class="s"> %H:%M&quot;</span><span class="p">))</span>
-        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txtDate</span><span class="p">)</span>
-        <span class="n">category</span> <span class="o">=</span> <span class="s">&quot;Category: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;category&#39;</span><span class="p">])</span>
-        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
-        <span class="n">txtTag</span> <span class="o">=</span> <span class="s">&quot;Tags: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">])</span>
-        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txtTag</span><span class="p">)</span>
-        <span class="n">txtSlug</span> <span class="o">=</span> <span class="s">&quot;Slug: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;slug&#39;</span><span class="p">])</span>
-        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txtSlug</span><span class="p">)</span>
-        <span class="n">txtAuthor</span> <span class="o">=</span> <span class="s">&quot;Author: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s">&quot;JMG&quot;</span><span class="p">)</span>
-        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txtAuthor</span><span class="p">)</span>
-        <span class="n">txtSummary</span> <span class="o">=</span> <span class="s">&quot;Summary: {0}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;summary&#39;</span><span class="p">])</span>
-        <span class="n">outFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">txtSummary</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">write_content</span><span class="p">(</span><span class="n">gather_user_data</span><span class="p">())</span>
-
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span>
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>A simple script to generate the metadata at the top of a Pelican article</p>
+                <a class="readmore" href="http://jmg95.github.io/pelican-article-creator.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
