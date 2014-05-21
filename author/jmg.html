@@ -22,7 +22,92 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="http://jmg95.github.io/arcgis-raster-footprints.html">ArcGIS Raster Footprints</a></h1>
+                    <h1 class="entry-title"><a href="http://jmg95.github.io/python-unicode-csv-reader-writer.html">Python Unicode CSV Reader/Writer</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2014-05-20T19:02:00">
+                Tue 20 May 2014
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://jmg95.github.io/author/jmg.html">JMG</a>
+        </address>
+<p>In <a href="http://jmg95.github.io/category/tech.html">Tech</a>. </p>
+<p>tags: <a href="http://jmg95.github.io/tag/python.html">python</a></p>
+</footer><!-- /.post-info --><p>So there are times that Python's implementation of Unicode can be quite frustrating. I can't count how many times I have been working with CSV files, pulling data out of another file format or extracting data from a database, only to get an ASCII cannot decode error. I found the handy code below that does a pretty fair job of handling reading and writing Unicode CSV files. I pulled this straight from the Python documenation <a href="https://docs.python.org/2.7/library/csv.html#examples">CSV</a>, so I take no credit (or blame) for it. </p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">csv</span><span class="o">,</span> <span class="nn">codecs</span><span class="o">,</span> <span class="nn">cStringIO</span>
+
+<span class="k">class</span> <span class="nc">UTF8Recoder</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Iterator that reads an encoded stream and reencodes the input to UTF-8</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">getreader</span><span class="p">(</span><span class="n">encoding</span><span class="p">)(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">next</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&quot;utf-8&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">UnicodeReader</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A CSV reader which will iterate over lines in the CSV file &quot;f&quot;,</span>
+<span class="sd">    which is encoded in the given encoding.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">excel</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&quot;utf-8&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">UTF8Recoder</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">unicode</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<span class="k">class</span> <span class="nc">UnicodeWriter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A CSV writer which will write rows to CSV file &quot;f&quot;,</span>
+<span class="sd">    which is encoded in the given encoding.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">excel</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&quot;utf-8&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+        <span class="c"># Redirect output to a queue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">cStringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="n">f</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">getincrementalencoder</span><span class="p">(</span><span class="n">encoding</span><span class="p">)()</span>
+
+    <span class="k">def</span> <span class="nf">writerow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="nb">unicode</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">row</span><span class="p">])</span>
+        <span class="c"># Fetch UTF-8 output from the queue ...</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="c"># ... and reencode it into the target encoding</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="c"># write to the target stream</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="c"># empty queue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">truncate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">writerows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="http://jmg95.github.io/arcgis-raster-footprints.html" rel="bookmark"
+                           title="Permalink to ArcGIS Raster Footprints">ArcGIS Raster Footprints</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2014-04-03T19:08:00">
                 Thu 03 April 2014
@@ -33,110 +118,10 @@
         </address>
 <p>In <a href="http://jmg95.github.io/category/tech.html">Tech</a>. </p>
 <p>tags: <a href="http://jmg95.github.io/tag/gis.html">gis</a><a href="http://jmg95.github.io/tag/arcpy.html">arcpy</a></p>
-</footer><!-- /.post-info --><p>Occasionally while working with rasters in ArcGIS I have the need to create "footprints" of the extent of each raster. For a while we just used the minimum bounding rectangle of each raster, but then our clients requested to see the actual boundary. There are several raster toolsets that will accomplish this, but typically require a higher level of ArcGIS use or were slow because they actually processed the image to determine the extent of coverage. We were typically georeferencing historical maps so we would crop the images to the extent we required. The solution we ended up with utilizes the world file that is created when the georeferencing takes place. Based on the extents and rotation of the coordinates in the world file we create a polygon. Below is the Python code we came up.</p>
-<div class="highlight"><pre><span class="kn">import</span> <span class="nn">arcpy</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">xml.dom.minidom</span> <span class="kn">import</span> <span class="n">parse</span>
-
-<span class="k">def</span> <span class="nf">get_raster_bounding_poly</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">worldfile</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create footprint polygon based on pixel size and rotation of raster image.</span>
-<span class="sd">    Use worldfile to determine scale and rotation. Pass in raster image and</span>
-<span class="sd">    path to world file to return arcpy.Polygon of footprint of the raster image.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">wf_values</span> <span class="o">=</span> <span class="n">read_world</span><span class="p">(</span><span class="n">worldfile</span><span class="p">)</span>
-    <span class="n">px_rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arcpy</span><span class="o">.</span><span class="n">GetRasterProperties_management</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="s">&quot;ROWCOUNT&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">getOutput</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-    <span class="n">px_columns</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arcpy</span><span class="o">.</span><span class="n">GetRasterProperties_management</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="s">&quot;COLUMNCOUNT&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">getOutput</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-    <span class="n">thePoints</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Array</span><span class="p">()</span>
-    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_coords_from_raster</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">wf_values</span><span class="p">)</span>
-    <span class="n">topLeft</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_coords_from_raster</span><span class="p">(</span><span class="n">px_columns</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">wf_values</span><span class="p">)</span>
-    <span class="n">topRight</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_coords_from_raster</span><span class="p">(</span><span class="n">px_columns</span><span class="p">,</span> <span class="n">px_rows</span><span class="p">,</span> <span class="n">wf_values</span><span class="p">)</span>
-    <span class="n">botRight</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_coords_from_raster</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">px_rows</span><span class="p">,</span> <span class="n">wf_values</span><span class="p">)</span>
-    <span class="n">botLeft</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="n">thePoints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">topLeft</span><span class="p">)</span>
-    <span class="n">thePoints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">topRight</span><span class="p">)</span>
-    <span class="n">thePoints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">botRight</span><span class="p">)</span>
-    <span class="n">thePoints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">botLeft</span><span class="p">)</span>
-    <span class="n">thePoints</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">topLeft</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">Polygon</span><span class="p">(</span><span class="n">thePoints</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">get_raster_list</span><span class="p">(</span><span class="n">thePath</span><span class="p">):</span>
-    <span class="s">&quot;Helper function to set env.workspace and return list of Rasters&quot;</span>
-    <span class="n">arcpy</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">workspace</span> <span class="o">=</span> <span class="n">thePath</span>
-    <span class="k">return</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">ListRasters</span><span class="p">()</span>
-
-<span class="k">def</span> <span class="nf">read_world</span><span class="p">(</span><span class="n">worldfile</span><span class="p">):</span>
-    <span class="s">&quot;Read WorldFile from disk and put variables into Dict()&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">worldfile</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wf</span><span class="p">:</span>
-        <span class="n">theVals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">wf</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
-    <span class="n">myVals</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">theVals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                  <span class="n">D</span><span class="o">=</span><span class="n">theVals</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                  <span class="n">B</span><span class="o">=</span><span class="n">theVals</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-                  <span class="n">E</span><span class="o">=</span><span class="n">theVals</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
-                  <span class="n">C</span><span class="o">=</span><span class="n">theVals</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
-                  <span class="n">F</span><span class="o">=</span><span class="n">theVals</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">myVals</span>
-
-<span class="k">def</span> <span class="nf">get_coords_from_raster</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">worldVals</span><span class="p">):</span>
-    <span class="s">&quot;Pass x,y as pixel positions from image along with Dict of world file values to return back map coords&quot;</span>
-    <span class="n">x1</span> <span class="o">=</span> <span class="p">(</span><span class="n">worldVals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">worldVals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;B&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">worldVals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">)</span>
-    <span class="n">y1</span> <span class="o">=</span> <span class="p">(</span><span class="n">worldVals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;D&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">worldVals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;E&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">worldVals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">determine_wf_name</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">raster</span><span class="p">):</span>
-    <span class="s">&quot;Determine the world file name based on raster (tif, jpg, bil)&quot;</span>
-    <span class="n">wfname</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">raster</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.tif&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.tfw&quot;</span><span class="p">)):</span>
-            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.tfw&quot;</span>
-        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.tifw&quot;</span><span class="p">)):</span>
-            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.tifw&quot;</span>
-        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.tfwx&quot;</span><span class="p">)):</span>
-            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.tfwx&quot;</span>
-    <span class="k">elif</span> <span class="n">ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.jpg&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.jgw&quot;</span><span class="p">)):</span>
-            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.jgw&quot;</span>
-        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.jpgw&quot;</span><span class="p">)):</span>
-            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.jpgw&quot;</span>
-        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.jgwx&quot;</span><span class="p">)):</span>
-            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.jgwx&quot;</span>
-    <span class="k">elif</span> <span class="n">ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.bil&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.blw&quot;</span><span class="p">)):</span>
-            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.blw&quot;</span>
-        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.bilw&quot;</span><span class="p">)):</span>
-            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.bilw&quot;</span>
-        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.bilx&quot;</span><span class="p">)):</span>
-            <span class="n">wfname</span> <span class="o">=</span>  <span class="n">fn</span> <span class="o">+</span> <span class="s">&quot;.bilx&quot;</span>
-    <span class="k">if</span> <span class="n">wfname</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rasterPath</span><span class="p">,</span> <span class="n">wfname</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
-
-<span class="k">def</span> <span class="nf">get_raster_spatial_reference</span><span class="p">(</span><span class="n">theXml</span><span class="p">):</span>
-    <span class="s">&quot;Return the SpatialReference base on WKT from aux.xml file for Georeferenced Rasters&quot;</span>
-    <span class="n">myXml</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">theXml</span><span class="p">)</span>
-
-    <span class="n">wkt_elements</span> <span class="o">=</span> <span class="n">myXml</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s">&quot;WKT&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">wkt_elements</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">wkt</span> <span class="o">=</span> <span class="n">wkt_elements</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">print</span> <span class="s">&quot;No WKT text&quot;</span>
-        <span class="k">return</span> <span class="bp">None</span>
-
-    <span class="n">wktText</span> <span class="o">=</span> <span class="n">wkt</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">data</span>
-    <span class="n">sr</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">SpatialReference</span><span class="p">()</span>
-    <span class="n">sr</span><span class="o">.</span><span class="n">loadFromString</span><span class="p">(</span><span class="n">wktText</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">sr</span>
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Python script to create footprint boundaries around rasters in ArcGIS</p>
+                <a class="readmore" href="http://jmg95.github.io/arcgis-raster-footprints.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
