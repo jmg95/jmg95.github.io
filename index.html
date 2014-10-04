@@ -22,7 +22,40 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="http://jmg95.github.io/python-unicode-csv-reader-writer.html">Python Unicode CSV Reader/Writer</a></h1>
+                    <h1 class="entry-title"><a href="http://jmg95.github.io/texas-rangers-ugly-2014.html">Texas Rangers Ugly 2014</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2014-10-04T14:35:00">
+                Sat 04 October 2014
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://jmg95.github.io/author/jmg.html">JMG</a>
+        </address>
+<p>In <a href="http://jmg95.github.io/category/sport.html">Sport</a>. </p>
+<p>tags: <a href="http://jmg95.github.io/tag/rangers.html">rangers</a></p>
+</footer><!-- /.post-info --><p>It's hard to describe the absolute disaster that the Texas Rangers 2014 campain
+was. As hard as it is to describe, it was even harder to watch, so for the most
+part I didn't. Maybe that makes me a fair weather fan, but so be it. The final
+67 win and 95 loss season was a far cry from the 86 win, 2nd place in the AL
+West I had predicted at the beginning of the season
+(<a href="http://jmg95.github.io/tx-rangers-preview-2014.html">here</a>).</p>
+<p>The exit of Ron Washington may give the team a chance for a much needed fresh
+start. I think Tim Bogar would be a decent choice, but I would really like to
+see Mike Maddux take over as skipper. He has managed to make great strides in
+getting the best out of pitchers, working in very much of a hitters' park.</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="http://jmg95.github.io/python-unicode-csv-reader-writer.html" rel="bookmark"
+                           title="Permalink to Python Unicode CSV Reader/Writer">Python Unicode CSV Reader/Writer</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2014-05-20T19:02:00">
                 Tue 20 May 2014
@@ -33,73 +66,10 @@
         </address>
 <p>In <a href="http://jmg95.github.io/category/tech.html">Tech</a>. </p>
 <p>tags: <a href="http://jmg95.github.io/tag/python.html">python</a></p>
-</footer><!-- /.post-info --><p>So there are times that Python's implementation of Unicode can be quite frustrating. I can't count how many times I have been working with CSV files, pulling data out of another file format or extracting data from a database, only to get an ASCII cannot decode error. I found the handy code below that does a pretty fair job of handling reading and writing Unicode CSV files. I pulled this straight from the Python documenation <a href="https://docs.python.org/2.7/library/csv.html#examples">CSV</a>, so I take no credit (or blame) for it. </p>
-<div class="highlight"><pre><span class="kn">import</span> <span class="nn">csv</span><span class="o">,</span> <span class="nn">codecs</span><span class="o">,</span> <span class="nn">cStringIO</span>
-
-<span class="k">class</span> <span class="nc">UTF8Recoder</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Iterator that reads an encoded stream and reencodes the input to UTF-8</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">getreader</span><span class="p">(</span><span class="n">encoding</span><span class="p">)(</span><span class="n">f</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span>
-
-    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">next</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&quot;utf-8&quot;</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">UnicodeReader</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A CSV reader which will iterate over lines in the CSV file &quot;f&quot;,</span>
-<span class="sd">    which is encoded in the given encoding.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">excel</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&quot;utf-8&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">UTF8Recoder</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">[</span><span class="nb">unicode</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span>
-
-<span class="k">class</span> <span class="nc">UnicodeWriter</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A CSV writer which will write rows to CSV file &quot;f&quot;,</span>
-<span class="sd">    which is encoded in the given encoding.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">excel</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&quot;utf-8&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
-        <span class="c"># Redirect output to a queue</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">cStringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="n">dialect</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="n">f</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">getincrementalencoder</span><span class="p">(</span><span class="n">encoding</span><span class="p">)()</span>
-
-    <span class="k">def</span> <span class="nf">writerow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="nb">unicode</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">row</span><span class="p">])</span>
-        <span class="c"># Fetch UTF-8 output from the queue ...</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&quot;utf-8&quot;</span><span class="p">)</span>
-        <span class="c"># ... and reencode it into the target encoding</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="c"># write to the target stream</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="c"># empty queue</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">truncate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">writerows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-</pre></div>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>Read and Write Unicode CSV files with Python</p>
+                <a class="readmore" href="http://jmg95.github.io/python-unicode-csv-reader-writer.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
